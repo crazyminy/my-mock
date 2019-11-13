@@ -3,6 +3,8 @@ const path = require('path');
 const fs = require('fs');
 const redisClient = require("./redisUtil");
 const multipart = require('connect-multiparty');
+const bodyParser = require('body-parser');
+const urlencodedParser = bodyParser.urlencoded({extended:false});
 const multipartMiddleware = multipart();
 
 //新加入的对象
@@ -62,6 +64,10 @@ var app = express();
 
 app.use(express.static(path.join(__dirname,'dist')));
 
+app.post('/getSet',function(req,res){
+    res.send(keySet);
+})
+
 app.post('/api/:methodName',function(req,res){
     //console.log(req.params.methodName);
     //redisClient.
@@ -77,11 +83,12 @@ app.post('/api/:methodName',function(req,res){
     })
 })
 
-app.post('/set',multipartMiddleware,function(req,res){
+app.post('/set',urlencodedParser,function(req,res){
     //console.log(req.body);
     //res.send("over");
     let key = req.body.key;
-    let value = req.body.jsonStr;
+    let value = req.body.value;
+    //console.log(key+value);
     redisClient.exists(key,function(err,rep){
         // if(rep === 1){
         //     res.send("dup");
@@ -104,10 +111,10 @@ app.post('/set',multipartMiddleware,function(req,res){
         });
     })
 })
-app.listen(600000,()=>{
+app.listen(3001,()=>{
     console.log("complete start")
 });
 
 
 //setInterval(600000,updateLocalFile);
-setInterval(updateLocalFile,5000);
+setInterval(updateLocalFile,600000);
